@@ -166,6 +166,7 @@ export default () => {
             samplesPerSecond:
                 DataManager().getSamplesPerSecond(),
         });
+        window.exportCsv();
     };
 
     const startSampling = async () => {
