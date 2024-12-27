@@ -50,6 +50,12 @@ export default (): BitDataAccumulator => ({
             const bitState = averagedBitState(bits, i);
             this.processBitState(bitState, i);
         });
+
+        if (this.accumulator!.every(channel => channel === always1) && !window.willStopSampling) {
+            console.log("all ones! stopping sampling");
+            window.willStopSampling = true;
+            window.stopSampling!();
+        }
     },
 
     processBitState(bitState, channel) {
