@@ -25,6 +25,14 @@ export const microSecondsPerSecond = 1e6;
 const tempBuffer = new Uint8Array(6);
 const tempView = new DataView(tempBuffer.buffer);
 
+declare global {
+    interface Window {
+      startSampling?: () => void;
+      stopSampling?: () => void;
+      willStopSampling: boolean;
+    }
+}
+
 export interface GlobalOptions {
     /** The number of samples per second */
     samplesPerSecond: number;
