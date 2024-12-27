@@ -153,6 +153,40 @@ export default () => {
         setRemainingTime(calcRemainingTime(freeSpace, sampleFreq));
     }, [freeSpace, sampleFreq]);
 
+    const stopSampling = () => {
+        if (!samplingRunning) {
+            return;
+        }
+
+        onWriteListener.current?.();
+        dispatch(samplingStop());
+        telemetry.sendEvent('StopSampling', {
+            mode: recordingMode,
+            duration: DataManager().getTimestamp(),
+            samplesPerSecond:
+                DataManager().getSamplesPerSecond(),
+        });
+    };
+
+    const startSampling = async () => {
+        if (samplingRunning) {
+            return;
+        }
+        window.willStopSampling = false;
+        if (
+            DataManager().getTimestamp() > 0 &&
+            !getDoNotAskStartAndClear(false) &&
+            savePending
+        ) {
+            setShowDialog(true);
+        } else {
+            await startAndClear();
+        }
+    }
+
+    window.startSampling = startSampling;
+    window.stopSampling = stopSampling;
+
     return (
         <>
             <Group heading="Sampling parameters" gap={4}>
@@ -166,26 +200,11 @@ export default () => {
                     stopText="Stop"
                     onClick={async () => {
                         if (samplingRunning) {
-                            onWriteListener.current?.();
-                            dispatch(samplingStop());
-                            telemetry.sendEvent('StopSampling', {
-                                mode: recordingMode,
-                                duration: DataManager().getTimestamp(),
-                                samplesPerSecond:
-                                    DataManager().getSamplesPerSecond(),
-                            });
+                            stopSampling();
                             return;
                         }
 
-                        if (
-                            DataManager().getTimestamp() > 0 &&
-                            !getDoNotAskStartAndClear(false) &&
-                            savePending
-                        ) {
-                            setShowDialog(true);
-                        } else {
-                            await startAndClear();
-                        }
+                        await startSampling();
                     }}
                     showIcon
                     variant="secondary"
