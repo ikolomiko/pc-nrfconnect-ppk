@@ -30,7 +30,37 @@ declare global {
       startSampling?: () => void;
       stopSampling?: () => void;
       willStopSampling: boolean;
+      exportCsv: () => void;
     }
+}
+
+function getElementByXPath(xpath: string): HTMLElement | null {
+    const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+    const element = result.singleNodeValue;
+    return element instanceof HTMLElement ? element : null;
+}
+
+function sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+window.exportCsv = async () => {
+    // click on Save / Export
+    await sleep(500);
+    getElementByXPath("/html/body/div/div/div[2]/div[1]/div/div[4]/button[1]")!.click();
+  
+    // select csv
+    await sleep(500);
+    getElementByXPath("/html/body/div[3]/div/div/div[2]/div/button[2]")!.click();
+    
+    // select "all window"
+    await sleep(500);
+    getElementByXPath("/html/body/div[3]/div/div/div[2]/div/div[1]/div[1]/div[1]/button[1]")!.click();
+
+    
+    // click save
+    await sleep(500);
+    getElementByXPath("/html/body/div[3]/div/div/div[3]/button[1]")!.click();
 }
 
 export interface GlobalOptions {
