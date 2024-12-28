@@ -38,6 +38,7 @@ declare global {
         csvDir: string | undefined;
         exportPath: string | undefined;
         askForConfirmation: boolean;
+        minimumExperimentSeconds: number; // minimum experiment duration in seconds
         start: () => void;
       };
       dut: {
@@ -62,6 +63,7 @@ window.experiment = {
     csvDir: undefined,
     exportPath: undefined,
     askForConfirmation: true,
+    minimumExperimentSeconds: 1,
     start: () => {
         // either exportPath or [name, csvDir] should be defined
         if (window.experiment.exportPath === undefined) {
