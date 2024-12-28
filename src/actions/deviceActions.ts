@@ -162,7 +162,7 @@ export const samplingStop =
         await device.ppkAverageStop();
         stopPreventSleep();
         releaseFileWriteListener?.();
-        window.willStopSampling = false;
+        window.afterStopSampling();
     };
 
 export const updateSpikeFilter = (): AppThunk<RootState> => (_, getState) => {

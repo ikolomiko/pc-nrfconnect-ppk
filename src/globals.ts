@@ -29,6 +29,7 @@ declare global {
     interface Window {
       startSampling: () => void;
       stopSampling: () => void;
+      afterStopSampling: () => void;
       willStopSampling: boolean;
       exportCsv: () => void;
       experiment: {
@@ -48,6 +49,12 @@ declare global {
 function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+window.afterStopSampling = async () => {
+    window.willStopSampling = false;
+    await sleep(1000);
+    window.dut.disablePowerOutput();
+};
 
 window.experiment = {
     name: undefined,
@@ -74,9 +81,9 @@ window.experiment = {
         }
 
         const confirmed: boolean = !window.experiment.askForConfirmation || confirm(
-            "Experiment name       : " + window.experiment.name + "\n" +
-            "CSV export directory  : " + window.experiment.csvDir + "\n" +
-            "Experiment export path: " + window.experiment.exportPath + "\n\n" +
+            "Experiment name\t\t\t: " + window.experiment.name + "\n" +
+            "CSV export directory\t\t: " + window.experiment.csvDir + "\n" +
+            "Experiment export path\t: " + window.experiment.exportPath + "\n\n" +
             "Start the experiment with these values?"
         );
         if (confirmed) {
