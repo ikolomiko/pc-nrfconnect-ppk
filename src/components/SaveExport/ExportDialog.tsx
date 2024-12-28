@@ -23,7 +23,7 @@ import * as mathjs from 'mathjs';
 import { dirname, join } from 'path';
 
 import exportChart from '../../actions/exportChartAction';
-import { timestampToIndex } from '../../globals';
+import { DataManager, timestampToIndex } from '../../globals';
 import { appState, hideExportDialog } from '../../slices/appSlice';
 import { getChartXAxisRange, getCursorRange } from '../../slices/chartSlice';
 import { getLastSaveDir, setLastSaveDir } from '../../utils/persistentStore';
@@ -190,6 +190,22 @@ export default () => {
             )
         );
     };
+
+    window.exportCsv = async () => {
+        setExporting(true);
+        dispatch(
+            exportChart(
+                window.experiment.exportPath!,
+                0,
+                DataManager().getTimestamp(),
+                contentSelection,
+                setProgress,
+                setExporting,
+                cancel
+            )
+        );
+    };
+
     return (
         <GenericDialog
             className="tw-preflight"
