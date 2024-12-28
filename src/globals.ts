@@ -27,17 +27,22 @@ const tempView = new DataView(tempBuffer.buffer);
 
 declare global {
     interface Window {
-      startSampling?: () => void;
-      stopSampling?: () => void;
+      startSampling: () => void;
+      stopSampling: () => void;
       willStopSampling: boolean;
       exportCsv: () => void;
+      experiment: {
+        name: string | undefined;
+        csvDir: string | undefined;
+        exportPath: string | undefined;
+        askForConfirmation: boolean;
+        start: () => void;
+      };
+      dut: {
+        enablePowerOutput: () => void;
+        disablePowerOutput: () => void;
+      };
     }
-}
-
-function getElementByXPath(xpath: string): HTMLElement | null {
-    const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
-    const element = result.singleNodeValue;
-    return element instanceof HTMLElement ? element : null;
 }
 
 function sleep(ms: number): Promise<void> {
