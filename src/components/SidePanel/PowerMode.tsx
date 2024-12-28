@@ -52,6 +52,15 @@ export default () => {
         },
     ];
 
+    window.dut = {
+        disablePowerOutput: () => {
+            dispatch(setDeviceRunning(false));
+        },
+        enablePowerOutput: () => {
+            dispatch(setDeviceRunning(true));
+        }
+    }
+
     return (
         <Group
             heading={`${
