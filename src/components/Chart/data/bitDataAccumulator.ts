@@ -6,7 +6,7 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion -- added temporarily to be conservative while converting to typescript */
 
-import { numberOfDigitalChannels } from '../../../globals';
+import { DataManager, numberOfDigitalChannels } from '../../../globals';
 import {
     always0,
     always1,
@@ -52,6 +52,9 @@ export default (): BitDataAccumulator => ({
         });
 
         if (this.accumulator!.every(channel => channel === always1) && !window.willStopSampling) {
+            if (DataManager().getTimestamp() < window.experiment.minimumExperimentSeconds * 1e6) {
+                return;
+            }
             console.log("all ones! stopping sampling");
             window.willStopSampling = true;
             window.stopSampling!();
