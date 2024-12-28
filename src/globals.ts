@@ -6,6 +6,7 @@
 
 import { getCurrentWindow } from '@electron/remote';
 import path from 'path';
+import fs from 'fs';
 import { v4 } from 'uuid';
 
 import { FileBuffer } from './utils/FileBuffer';
@@ -92,6 +93,45 @@ window.experiment = {
         }
     }
 }
+
+
+/**
+ * Reads a JSON file from the $XDG_CONFIG_DIR/pc-nrfconnect-ppk/settings.json path asynchronously.
+ * @returns {Promise<Object>} A promise that resolves to the parsed JSON object.
+ * Definitely not written by an LLM :)
+ */
+const loadSettingsAsync = (): Promise<Object> => {
+    return new Promise((resolve, reject) => {
+        // Step 1: Get the $XDG_CONFIG_DIR environment variable or fallback to ~/.config
+        const configDir = process.env.XDG_CONFIG_HOME || path.join(process.env.HOME!, '.config');
+
+        // Step 2: Construct the path to settings.json
+        const settingsFilePath = path.join(configDir, '/pc-nrfconnect-ppk/', 'settings.json');
+
+        // Step 3: Read the JSON file asynchronously
+        fs.readFile(settingsFilePath, 'utf8', (err, data) => {
+            if (err) {
+              return reject(new Error(`Error reading the settings.json file: ${err.message}`));
+            }
+
+            try {
+              // Step 4: Parse the JSON data
+              const settings = JSON.parse(data);
+              resolve(settings);  // Resolve the promise with the parsed object
+            } catch (parseError: any) {
+              reject(new Error(`Error parsing JSON: ${parseError.message}`));
+            }
+        });
+    });
+}
+
+loadSettingsAsync()
+    .then(settings => {
+        Object.assign(window.experiment, settings); 
+        return settings
+    })
+    .then(settings => console.log('Settings loaded:', settings))
+    .catch(error => console.error(error.message));
 
 export interface GlobalOptions {
     /** The number of samples per second */
