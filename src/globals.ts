@@ -49,23 +49,41 @@ function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-window.exportCsv = async () => {
-    // click on Save / Export
-    await sleep(500);
-    getElementByXPath("/html/body/div/div/div[2]/div[1]/div/div[4]/button[1]")!.click();
-  
-    // select csv
-    await sleep(500);
-    getElementByXPath("/html/body/div[3]/div/div/div[2]/div/button[2]")!.click();
-    
-    // select "all window"
-    await sleep(500);
-    getElementByXPath("/html/body/div[3]/div/div/div[2]/div/div[1]/div[1]/div[1]/button[1]")!.click();
+window.experiment = {
+    name: undefined,
+    csvDir: undefined,
+    exportPath: undefined,
+    askForConfirmation: true,
+    start: () => {
+        // either exportPath or [name, csvDir] should be defined
+        if (window.experiment.exportPath === undefined) {
+            if (window.experiment.name === undefined) {
+                console.error("Please set the experiment name with `experiment.name = '<experiment name>'`");
+                return;
+            }
 
-    
-    // click save
-    await sleep(500);
-    getElementByXPath("/html/body/div[3]/div/div/div[3]/button[1]")!.click();
+            if (window.experiment.csvDir === undefined) {
+                console.error("Please set the CSV export directory with `experiment.csvDir = '/path/to/csvdir'`");
+                return;
+            }
+
+            window.experiment.exportPath = path.join(window.experiment.csvDir, window.experiment.name + ".csv");
+        } else {
+            window.experiment.name = path.basename(window.experiment.exportPath, ".csv");
+            window.experiment.csvDir = path.dirname(window.experiment.exportPath);
+        }
+
+        const confirmed: boolean = !window.experiment.askForConfirmation || confirm(
+            "Experiment name       : " + window.experiment.name + "\n" +
+            "CSV export directory  : " + window.experiment.csvDir + "\n" +
+            "Experiment export path: " + window.experiment.exportPath + "\n\n" +
+            "Start the experiment with these values?"
+        );
+        if (confirmed) {
+            window.startSampling();
+            setTimeout(window.dut.enablePowerOutput, 500);
+        }
+    }
 }
 
 export interface GlobalOptions {
